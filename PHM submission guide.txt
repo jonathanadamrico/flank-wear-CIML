@@ -1,0 +1,32 @@
+#PHM submission
+
+pip freeze | findstr /r "numpy pandas xgboost scipy scikit-learn" > requirements.txt
+
+
+
+#Run Docker Desktop first.
+
+[In PowerShell]
+docker build --no-cache -t phm-solution .
+docker save -o phm-solution.tar phm-solution
+
+[In WSL terminal]
+docker save phm-solution | gzip > phm-solution.tar.gz
+
+
+#To test locally, create folders for /tcdata and /work in the same place as the .tar Docker file.
+Go up one folder outside /solution. Move the tar file as well outside /solution.
+
+[In Command Prompt]
+docker load < .\phm-solution.tar
+
+[In PowerShell]
+$tcdata = Join-Path $PWD "tcdata"
+$work = Join-Path $PWD "work"
+docker run -m 6g --memory=6g --memory-swap=6g --oom-kill-disable=false -v "${tcdata}:/tcdata" -v "${work}:/work" --rm phm-solution sh run.sh
+
+# Stop docker container
+docker rm <container_id>
+
+# Delete inactive containers
+docker system prune -a --volumes
